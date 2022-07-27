@@ -1,5 +1,6 @@
 package co.com.sofka.usecase.playerbyemail;
 
+import co.com.sofka.exceptions.PlayerException;
 import co.com.sofka.generic.usecase.UseCase;
 import co.com.sofka.model.player.Player;
 import co.com.sofka.model.player.gateways.PlayerRepository;
@@ -11,6 +12,7 @@ public class PlayerByEmailUseCase extends UseCase {
     private final PlayerRepository repository;
 
     public Mono<Player> findByEmail(String email) {
-        return repository.findById("email", email);
+        return repository.findById("email", email)
+                .onErrorResume(error -> Mono.error(new PlayerException("Doesn't exists an user with the given email")));
     }
 }

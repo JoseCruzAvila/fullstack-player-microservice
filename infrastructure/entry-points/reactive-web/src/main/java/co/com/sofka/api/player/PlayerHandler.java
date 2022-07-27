@@ -22,7 +22,8 @@ public class PlayerHandler {
                 .flatMap(createPlayerUseCase::createPlayer)
                 .flatMap(player -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(player)));
+                        .body(BodyInserters.fromValue(player)))
+                .onErrorResume(this::onErrorResume);
     }
 
     public Mono<ServerResponse> listenGETPlayerByEmailUseCase(ServerRequest serverRequest) {
@@ -31,6 +32,15 @@ public class PlayerHandler {
         return playerByEmailUseCase.findByEmail(email)
                 .flatMap(player -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(player)));
+                        .body(BodyInserters.fromValue(player)))
+                .onErrorResume(this::onErrorResume);
+    }
+
+    private Mono<ServerResponse> onErrorResume(Throwable error) {
+        return ServerResponse.status(error.getMessage()
+                        .toLowerCase()
+                        .contains("doesn't exists") ? 404 : 409)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(error.getMessage()));
     }
 }
