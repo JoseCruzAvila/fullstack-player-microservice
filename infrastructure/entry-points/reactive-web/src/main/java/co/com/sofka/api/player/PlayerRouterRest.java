@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -14,6 +15,7 @@ public class PlayerRouterRest {
 
     @Bean
     public RouterFunction<ServerResponse> playerRouterFunction(PlayerHandler playerHandler) {
-        return route(POST("/player"), playerHandler::listenPOSTCreatePlayerUseCase);
+        return route(POST("/player"), playerHandler::listenPOSTCreatePlayerUseCase)
+                .andRoute(GET("/player/{email}"), playerHandler::listenGETPlayerByEmailUseCase);
     }
 }
